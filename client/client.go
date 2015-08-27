@@ -4,46 +4,73 @@ import (
   "fmt"
   "log"
   "net"
+  // "net/http"
+  "io/ioutil"
 )
 
- func handleConnection(c net.Conn) {
+func check(e error) {
+    if e != nil {
+      panic(e)
+    }
+}
+
+func handleConnection(c net.Conn) {
 
   log.Printf("Server %v connected.", c.RemoteAddr())
 
   // stuff to do... like read data from client, process it, write back to client
   // see what you can do with (c net.Conn) at
   // http://golang.org/pkg/net/#Conn
-
+ 
   buffer := make([]byte, 4096)
   
-  n, err := c.Write([]byte("hello world"))
-  if err != nil {
-    c.Close()
-  }
-  n, err = c.Read(buffer)
-  if err != nil || n == 0 {
-    c.Close()
+  dat, err := ioutil.ReadFile("../media/Wzlogo.mp3")
+  check(err)
+  max := 0
+  for i := 0; i < len(dat); i += 4096 {
+    if i + 4096 < len(dat) {
+      max = i + 4096
+    } else {
+      max = len(dat) - 1
+    }
+    //sending to server
+    n, err := c.Write([]byte(dat[i:max]))
+    if err != nil {
+      c.Close()
+    }
+    //server reads the file
+    n, err = c.Read(buffer)
+    if err != nil || n == 0 {
+      c.Close()
+    }
+    fmt.Println(buffer);
   }
   
-  fmt.Println(buffer);
   log.Printf("Connection from %v closed.", c.RemoteAddr())
 }
 
 func main() {
+  // resp, err := http.Get("http://media-stream-1049.appspot.com/test")
+
   hostName := "localhost" // change this
   portNum := "3000"
-
   conn, err := net.Dial("tcp", hostName+":"+portNum)
+  
 
   if err != nil {
     fmt.Println(err)
     return
   }
 
+  // defer resp.Body.Close()
+  // body, err := ioutil.ReadAll(resp.Body)
+  // s := string(body[:])
+  // fmt.Println(s)
+
   handleConnection(conn)
 
-  fmt.Printf("Connection established between %s and localhost.\n", hostName)
-  fmt.Printf("Remote Address : %s \n", conn.RemoteAddr().String())
-  fmt.Printf("Local Address : %s \n", conn.LocalAddr().String())
+  // fmt.Printf("Connection established between %s and localhost.\n", hostName)
+  // fmt.Printf("Remote Address : %s \n", conn.RemoteAddr().String())
+  // fmt.Printf("Local Address : %s \n", conn.LocalAddr().String())
 
 }
