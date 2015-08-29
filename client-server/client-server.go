@@ -8,10 +8,8 @@ import (
 
 func main() {
   http.HandleFunc("/", helper.ListOfFiles)
-  // http.HandleFunc("/media/", func())
-  fileServer := http.FileServer(http.Dir("../media"))
-  http.Handle("/media/", http.StripPrefix("/media/", fileServer))
-  
+  http.HandleFunc("/mpd/", helper.FindMpd)
+
   log.Println("Listening on port 3000")
   http.ListenAndServe(":3000", nil)
 }
