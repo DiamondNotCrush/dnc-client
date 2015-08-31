@@ -6,7 +6,6 @@ import (
   "encoding/json"
   "net/http"
   "io/ioutil"
-  "github.com/zencoder/go-dash/mpd"
 )
 
 func check(err error) {
@@ -28,19 +27,21 @@ func ListOfFiles(res http.ResponseWriter, req *http.Request) {
 }
 
 func Exists(name string) bool {
-  if _, err := os.Stat(name); err != nil {
-    if os.IsNotExist(err) {
-      return false
-    }
+  _, err := os.Stat(name)
+  if err != nil {
+    return false
   }
   return true
 }
 
 func FindMpd(res http.ResponseWriter, req *http.Request) {
-  if Exists("../mpd"+req.URL.Path) {
-    fmt.Println("Convert File: "+req.URL.Path)
+  path := ".." + req.URL.Path
+  if !Exists(path) {
+    fmt.Printf("Convert File: ")
+    fmt.Println(path)
   } else {
-    fmt.Println(req.URL.Path)
-    http.ServeFile(res, req, ".."+req.URL.Path)
+    fmt.Printf("Play File: ")
+    fmt.Println(path)
+    http.ServeFile(res, req, path)
   }
 }
