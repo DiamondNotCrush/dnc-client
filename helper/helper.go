@@ -10,20 +10,21 @@ func Check(err error) {
     }
 }
 
-func listRecursion(dir string, fileObj map[string]bool) {
-  files, err := ioutil.ReadDir(dir)
+func listRecursion(dir string, localDir string, fileObj map[string]bool) {
+  files, err := ioutil.ReadDir(dir+localDir)
   Check(err)
   for _, file := range files {
     if file.IsDir() {
-      listRecursion(dir+file.Name(), fileObj)
+      listRecursion(dir, localDir+file.Name()+"/", fileObj)
     } else {
-      fileObj[dir+file.Name()] = true
+      fileObj[localDir+file.Name()] = true
     }
   }
 }
 
 func ListFiles(dir string) (map[string]bool) {
-  var fileObj = make(map[string]bool)
-  listRecursion(dir, fileObj)
+  fileObj := make(map[string]bool)
+  localDir := ""
+  listRecursion(dir, localDir, fileObj)
   return fileObj
 }

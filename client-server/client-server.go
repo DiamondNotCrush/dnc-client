@@ -10,11 +10,17 @@ import (
 )
 
 func main() {
-  dir := "../mpd/"
+  fmt.Print("Folder to share (eg: ./library): ")
+  var input string
+  fmt.Scanln(&input)
+  if string(input[len(input) - 1]) != "/" {
+    input += "/"
+  }
+  dir := input // ../directory/
   sharedFiles := helper.ListFiles(dir)
 
   // respond with shared files
-  http.HandleFunc("/", func(res http.ResponseWriter, req *http.Request) {
+  http.HandleFunc("/library/", func(res http.ResponseWriter, req *http.Request) {
     sharedFiles = helper.ListFiles(dir)
     js, err := json.Marshal(sharedFiles)
     helper.Check(err)
@@ -23,14 +29,14 @@ func main() {
   })
 
   // serves up files if they are in the sharedFiles
-  http.HandleFunc("/mpd/", func(res http.ResponseWriter, req *http.Request) {
-    path := dir+strings.Join(strings.Split(req.URL.Path, "/")[2:], "")
+  http.HandleFunc("/shared/", func(res http.ResponseWriter, req *http.Request) {
+    path := strings.Join(strings.Split(req.URL.Path, "/")[2:], "/")
     if sharedFiles[path] {
-      fmt.Printf("Serving File: ")
+      fmt.Print("Serving file: ")
       fmt.Println(path)
-      http.ServeFile(res, req, path)
+      http.ServeFile(res, req, dir+path)
     } else {
-      fmt.Printf("Blocking File: ")
+      fmt.Print("Blocking file: ")
       fmt.Println(path)
     }
   })
