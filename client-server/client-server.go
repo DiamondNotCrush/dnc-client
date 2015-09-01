@@ -1,22 +1,26 @@
 package main
 
 import (
-  "fmt"
   "log"
   "strings"
+  "io/ioutil"
   "net/http"
   "encoding/json"
   "github.com/dnc/dnc-client/helper"
 )
 
 func main() {
-  fmt.Print("Folder to share (eg: ./library): ")
-  var input string
-  fmt.Scanln(&input)
-  if string(input[len(input) - 1]) != "/" {
-    input += "/"
+  // read port and dir from config file
+  config, err := ioutil.ReadFile("./config")
+  helper.Check(err)
+  configArr := strings.Split(string(config), "\"")
+  port := configArr[1]
+  dir := configArr[3]
+  if string(dir[len(dir) - 1]) != "/" {
+    dir += "/"
   }
-  dir := input // ../directory/
+
+  // build initial library
   sharedFiles := helper.ListFiles(dir)
 
   // respond with shared files
@@ -25,6 +29,13 @@ func main() {
     js, err := json.Marshal(sharedFiles)
     helper.Check(err)
     res.Header().Set("Content-Type", "application/json")
+    res.Header().Set("Access-Control-Allow-Origin", "*")
+    res.Header().Set("Access-Control-Allow-Methods", "POST, GET, OPTIONS, PUT, DELETE")
+    res.Header().Set("Access-Control-Allow-Headers", "Accept, Content-Type, Content-Length, Accept-Encoding, X-CSRF-Token, Authorization")
+    if req.Method == "OPTIONS" {
+        return
+    }
+    log.Print("Sending library")
     res.Write(js)
   })
 
@@ -32,15 +43,20 @@ func main() {
   http.HandleFunc("/shared/", func(res http.ResponseWriter, req *http.Request) {
     path := strings.Join(strings.Split(req.URL.Path, "/")[2:], "/")
     if sharedFiles[path] {
-      fmt.Print("Serving file: ")
-      fmt.Println(path)
+      log.Print("Serving file: "+path)
+      res.Header().Set("Access-Control-Allow-Origin", "*")
+      res.Header().Set("Access-Control-Allow-Methods", "POST, GET, OPTIONS, PUT, DELETE")
+      res.Header().Set("Access-Control-Allow-Headers", "Accept, Content-Type, Content-Length, Accept-Encoding, X-CSRF-Token, Authorization")
+      if req.Method == "OPTIONS" {
+        return
+      }
       http.ServeFile(res, req, dir+path)
     } else {
-      fmt.Print("Blocking file: ")
-      fmt.Println(path)
+      log.Print("Blocking file: "+path)
     }
   })
 
-  log.Println("Listening on port 3000")
-  http.ListenAndServe(":3000", nil)
+  // start server
+  log.Println("Listening on port "+port)
+  http.ListenAndServe(":"+port, nil)
 }
