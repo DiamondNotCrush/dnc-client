@@ -57,12 +57,12 @@ func Routes() *mux.Router {
 
 	router.HandleFunc("/shared/{path:.*}", func(res http.ResponseWriter, req *http.Request) {
 		path := mux.Vars(req)["path"]
+		res = setCORS(res)
+		if req.Method == "OPTIONS" {
+			return
+		}
 		if sharedFiles[path] {
 			log.Print("Serving file: " + path)
-			res = setCORS(res)
-			if req.Method == "OPTIONS" {
-				return
-			}
 			http.ServeFile(res, req, dir+path)
 		} else {
 			log.Print("Blocking file: " + path)
