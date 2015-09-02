@@ -1,0 +1,10 @@
+<!DOCTYPE html>
+<html>
+  <body>
+    <h1>Admin Portal</h1>
+    <p>Directory: {{.Dir}}</p>
+    <p>Port: {{.Port}}</p>
+    <input type="button" onclick="location.href='http://localhost:{{.Port}}/login';" value="Login" />
+    <input type="button" onclick="location.href='http://localhost:{{.Port}}/signup';" value="Signup" />
+  </body>
+</html>

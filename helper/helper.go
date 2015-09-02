@@ -1,6 +1,7 @@
 package helper
 
 import (
+	"encoding/json"
 	"io/ioutil"
 	"strings"
 )
@@ -48,4 +49,16 @@ func ListFiles(dir string) map[string]bool {
 	localDir := ""
 	listRecursion(dir, localDir, fileObj)
 	return fileObj
+}
+
+func JSONify(str string) []byte {
+	obj := make(map[string]string)
+	strArr := strings.Split(str, "&")
+	for i := range strArr {
+		tuple := strings.Split(strArr[i], "=")
+		obj[tuple[0]] = tuple[1]
+	}
+	js, err := json.Marshal(obj)
+	Check(err)
+	return js
 }

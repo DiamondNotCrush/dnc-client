@@ -1,6 +1,7 @@
 package router
 
 import (
+	"bytes"
 	"encoding/json"
 	"io/ioutil"
 	"log"
@@ -8,6 +9,7 @@ import (
 	"strings"
 
 	"github.com/dnc/dnc-client/helper"
+	"github.com/dnc/dnc-client/portal"
 	"github.com/gorilla/mux"
 )
 
@@ -41,6 +43,40 @@ func Port() string {
 
 func Routes() *mux.Router {
 	router := mux.NewRouter()
+
+	router.HandleFunc("/", func(res http.ResponseWriter, req *http.Request) {
+		portal.MainPage(res, req, dir, Port())
+	}).Methods("GET")
+
+	router.HandleFunc("/signup", func(res http.ResponseWriter, req *http.Request) {
+		portal.Signup(res, req)
+	}).Methods("GET")
+
+	router.HandleFunc("/signup", func(res http.ResponseWriter, req *http.Request) {
+		data, err := ioutil.ReadAll(req.Body)
+		helper.Check(err)
+		js := bytes.NewReader(helper.JSONify(string(data)))
+		sres, err := http.Post("https://diamondnotcrush.herokuapp.com/user/addUser", "application/json", js)
+		helper.Check(err)
+		sdata, err := ioutil.ReadAll(sres.Body)
+		helper.Check(err)
+		log.Println(string(sdata))
+	}).Methods("POST")
+
+	router.HandleFunc("/login", func(res http.ResponseWriter, req *http.Request) {
+		portal.Login(res, req)
+	}).Methods("GET")
+
+	router.HandleFunc("/login", func(res http.ResponseWriter, req *http.Request) {
+		data, err := ioutil.ReadAll(req.Body)
+		helper.Check(err)
+		js := bytes.NewReader(helper.JSONify(string(data)))
+		sres, err := http.Post("https://diamondnotcrush.herokuapp.com/user/login", "application/json", js)
+		helper.Check(err)
+		sdata, err := ioutil.ReadAll(sres.Body)
+		helper.Check(err)
+		log.Println(string(sdata))
+	}).Methods("POST")
 
 	router.HandleFunc("/library", func(res http.ResponseWriter, req *http.Request) {
 		sharedFiles = helper.ListFiles(dir)
