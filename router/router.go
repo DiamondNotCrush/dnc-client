@@ -15,6 +15,8 @@ import (
 
 var dir = getDir()
 var sharedFiles = helper.ListFiles(dir)
+var verify = false
+var userid = -1
 
 func setCORS(res http.ResponseWriter) http.ResponseWriter {
 	res.Header().Set("Access-Control-Allow-Origin", "*")
@@ -45,7 +47,7 @@ func Routes() *mux.Router {
 	router := mux.NewRouter()
 
 	router.HandleFunc("/", func(res http.ResponseWriter, req *http.Request) {
-		portal.MainPage(res, req, dir, Port())
+		portal.MainPage(res, req, dir, Port(), verify, userid)
 	}).Methods("GET")
 
 	router.HandleFunc("/signup", func(res http.ResponseWriter, req *http.Request) {
@@ -60,7 +62,17 @@ func Routes() *mux.Router {
 		helper.Check(err)
 		sdata, err := ioutil.ReadAll(sres.Body)
 		helper.Check(err)
-		log.Println(string(sdata))
+		var obj map[string]*json.RawMessage
+		err = json.Unmarshal(sdata, &obj)
+		helper.Check(err)
+		err = json.Unmarshal(*obj["id"], &userid)
+		helper.Check(err)
+		if err != nil {
+			log.Println("Signup failed")
+		} else {
+			log.Println("Signup success")
+		}
+		http.Redirect(res, req, "/", 302)
 	}).Methods("POST")
 
 	router.HandleFunc("/login", func(res http.ResponseWriter, req *http.Request) {
@@ -75,8 +87,32 @@ func Routes() *mux.Router {
 		helper.Check(err)
 		sdata, err := ioutil.ReadAll(sres.Body)
 		helper.Check(err)
-		log.Println(string(sdata))
+		var obj map[string]*json.RawMessage
+		err = json.Unmarshal(sdata, &obj)
+		helper.Check(err)
+		err = json.Unmarshal(*obj["id"], &userid)
+		helper.Check(err)
+		if err != nil {
+			log.Println("Signup failed")
+		} else {
+			log.Println("Signup success")
+		}
+		http.Redirect(res, req, "/", 302)
 	}).Methods("POST")
+
+	router.HandleFunc("/connection", func(res http.ResponseWriter, req *http.Request) {
+		if userid > -1 {
+			js := bytes.NewReader(helper.JSONify("userid=" + string(userid) + "&port=" + Port()))
+			_, err := http.Post("https://diamondnotcrush.herokuapp.com/connection/addConnection", "application/json", js)
+			helper.Check(err)
+		}
+		http.Redirect(res, req, "/", 302)
+	}).Methods("GET")
+
+	router.HandleFunc("/verify", func(res http.ResponseWriter, req *http.Request) {
+		verify = true
+		res.WriteHeader(200)
+	}).Methods("GET")
 
 	router.HandleFunc("/library", func(res http.ResponseWriter, req *http.Request) {
 		sharedFiles = helper.ListFiles(dir)

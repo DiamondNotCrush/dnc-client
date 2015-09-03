@@ -6,5 +6,11 @@
     <p>Port: {{.Port}}</p>
     <input type="button" onclick="location.href='http://localhost:{{.Port}}/login';" value="Login" />
     <input type="button" onclick="location.href='http://localhost:{{.Port}}/signup';" value="Signup" />
+    <input type="button" onclick="location.href='http://localhost:{{.Port}}/connection';" value="Test Connection" />
+    <p>Login Status:</p>
+    {{.LoginStatus}}
+    <p>Connection Status:</p>
+    {{.Verify}}
+    <p>To Test Connection: Signup or login, click 'Test Connection' and then refresh the page after a few seconds to check verification</p>
   </body>
 </html>
