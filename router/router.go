@@ -93,9 +93,9 @@ func Routes() *mux.Router {
 		err = json.Unmarshal(*obj["id"], &userid)
 		helper.Check(err)
 		if err != nil {
-			log.Println("Signup failed")
+			log.Println("Login failed")
 		} else {
-			log.Println("Signup success")
+			log.Println("Login success")
 		}
 		http.Redirect(res, req, "/", 302)
 	}).Methods("POST")
