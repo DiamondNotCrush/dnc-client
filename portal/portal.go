@@ -16,6 +16,7 @@ var tmain, _ = template.ParseFiles("../src/github.com/dnc/dnc-client/portal/temp
 var tsignup, _ = template.ParseFiles("../src/github.com/dnc/dnc-client/portal/templates/signup.html")
 var tlogin, _ = template.ParseFiles("../src/github.com/dnc/dnc-client/portal/templates/login.html")
 
+//check user status
 func MainPage(res http.ResponseWriter, req *http.Request, dir string, port string, result bool, userid int) {
 	verify := `<span style="color:red">Unverified</span>`
 	if result {
@@ -29,10 +30,12 @@ func MainPage(res http.ResponseWriter, req *http.Request, dir string, port strin
 	tmain.Execute(res, page)
 }
 
+//redirect to signup html
 func Signup(res http.ResponseWriter, req *http.Request) {
 	tsignup.Execute(res, nil)
 }
 
+//redirect to login html
 func Login(res http.ResponseWriter, req *http.Request) {
 	tlogin.Execute(res, nil)
 }

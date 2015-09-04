@@ -7,6 +7,7 @@ import (
 	"strings"
 )
 
+//acceptable filetypes
 var fileTypes = map[string]bool{
 	"3gp":  true,
 	"avi":  true,
@@ -30,6 +31,7 @@ func Check(err error) {
 	}
 }
 
+//lists all sub folders within the shared directory
 func listRecursion(dir string, localDir string, fileObj map[string]bool) {
 	files, err := ioutil.ReadDir(dir + localDir)
 	Check(err)
@@ -45,13 +47,14 @@ func listRecursion(dir string, localDir string, fileObj map[string]bool) {
 	}
 }
 
+//lists qualified files
 func ListFiles(dir string) map[string]bool {
 	fileObj := make(map[string]bool)
 	localDir := ""
 	listRecursion(dir, localDir, fileObj)
 	return fileObj
 }
-
+//form data into JSON object for login/signup
 func JSONify(str string) []byte {
 	obj := make(map[string]string)
 	strArr := strings.Split(str, "&")

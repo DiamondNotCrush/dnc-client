@@ -29,6 +29,7 @@ func init() {
 	badUrl = fmt.Sprintf("%s/shared/notype", server.URL)
 }
 
+//checks if library is working
 func TestLibrary(t *testing.T) {
 	request, err := http.NewRequest("GET", libraryUrl, nil)
 
@@ -45,6 +46,7 @@ func TestLibrary(t *testing.T) {
 	}
 }
 
+//checks if shared
 func TestShared(t *testing.T) {
 	request, err := http.NewRequest("GET", sharedUrl, nil)
 
@@ -59,6 +61,7 @@ func TestShared(t *testing.T) {
 	}
 }
 
+//checks if nested folder
 func TestNested(t *testing.T) {
 	request, err := http.NewRequest("GET", nestedUrl, nil)
 
@@ -73,6 +76,7 @@ func TestNested(t *testing.T) {
 	}
 }
 
+//checks if no type
 func TestBad(t *testing.T) {
 	request, err := http.NewRequest("GET", badUrl, nil)
 
