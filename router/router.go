@@ -14,6 +14,7 @@ import (
 )
 
 var dir = getDir()
+var port = getPort()
 var sharedFiles = helper.ListFiles(dir)
 var verify = false
 var userid = -1
@@ -26,10 +27,9 @@ func setCORS(res http.ResponseWriter) http.ResponseWriter {
 }
 
 func getDir() string {
-	config, err := ioutil.ReadFile("./config")
+	config, err := ioutil.ReadFile("config")
 	helper.Check(err)
-	configArr := strings.Split(string(config), "\"")
-	dir := configArr[3]
+	dir := strings.Split(strings.Split(string(config), "&")[0], "=")[1]
 	if string(dir[len(dir)-1]) != "/" {
 		dir += "/"
 	}
@@ -37,28 +37,55 @@ func getDir() string {
 }
 
 func Port() string {
-	config, err := ioutil.ReadFile("./config")
+	return port
+}
+
+func getPort() string {
+	config, err := ioutil.ReadFile("config")
 	helper.Check(err)
-	configArr := strings.Split(string(config), "\"")
-	return configArr[1]
+	port := strings.Split(strings.Split(string(config), "&")[1], "=")[1]
+	return port
 }
 
 func Routes() *mux.Router {
 	router := mux.NewRouter()
 
 	router.HandleFunc("/", func(res http.ResponseWriter, req *http.Request) {
+		if !helper.CheckAddr(req.RemoteAddr) {
+			return
+		}
 		portal.MainPage(res, req, dir, Port(), verify, userid)
 	}).Methods("GET")
 
+	router.HandleFunc("/", func(res http.ResponseWriter, req *http.Request) {
+		if !helper.CheckAddr(req.RemoteAddr) {
+			return
+		}
+		data, err := ioutil.ReadAll(req.Body)
+		helper.Check(err)
+		data = []byte(strings.Replace(string(data), "%2F", "/", -1))
+		err = ioutil.WriteFile("config", data, 0777)
+		helper.Check(err)
+		dir = getDir()
+		port = getPort()
+		portal.MainPage(res, req, dir, port, verify, userid)
+	}).Methods("POST")
+
 	router.HandleFunc("/signup", func(res http.ResponseWriter, req *http.Request) {
+		if !helper.CheckAddr(req.RemoteAddr) {
+			return
+		}
 		portal.Signup(res, req)
 	}).Methods("GET")
 
 	router.HandleFunc("/signup", func(res http.ResponseWriter, req *http.Request) {
+		if !helper.CheckAddr(req.RemoteAddr) {
+			return
+		}
 		data, err := ioutil.ReadAll(req.Body)
 		helper.Check(err)
 		js := bytes.NewReader(helper.JSONify(string(data)))
-		sres, err := http.Post("https://diamondnotcrush.herokuapp.com/user/addUser", "application/json", js)
+		sres, err := http.Post("http://dnctest.herokuapp.com/user/addUser", "application/json", js)
 		helper.Check(err)
 		sdata, err := ioutil.ReadAll(sres.Body)
 		helper.Check(err)
@@ -76,14 +103,20 @@ func Routes() *mux.Router {
 	}).Methods("POST")
 
 	router.HandleFunc("/login", func(res http.ResponseWriter, req *http.Request) {
+		if !helper.CheckAddr(req.RemoteAddr) {
+			return
+		}
 		portal.Login(res, req)
 	}).Methods("GET")
 
 	router.HandleFunc("/login", func(res http.ResponseWriter, req *http.Request) {
+		if !helper.CheckAddr(req.RemoteAddr) {
+			return
+		}
 		data, err := ioutil.ReadAll(req.Body)
 		helper.Check(err)
 		js := bytes.NewReader(helper.JSONify(string(data)))
-		sres, err := http.Post("https://diamondnotcrush.herokuapp.com/user/login", "application/json", js)
+		sres, err := http.Post("http://dnctest.herokuapp.com/user/login", "application/json", js)
 		helper.Check(err)
 		sdata, err := ioutil.ReadAll(sres.Body)
 		helper.Check(err)
@@ -99,15 +132,6 @@ func Routes() *mux.Router {
 		}
 		http.Redirect(res, req, "/", 302)
 	}).Methods("POST")
-
-	router.HandleFunc("/connection", func(res http.ResponseWriter, req *http.Request) {
-		if userid > -1 {
-			js := bytes.NewReader(helper.JSONify("userid=" + string(userid) + "&port=" + Port()))
-			_, err := http.Post("https://diamondnotcrush.herokuapp.com/connection/addConnection", "application/json", js)
-			helper.Check(err)
-		}
-		http.Redirect(res, req, "/", 302)
-	}).Methods("GET")
 
 	router.HandleFunc("/verify", func(res http.ResponseWriter, req *http.Request) {
 		verify = true

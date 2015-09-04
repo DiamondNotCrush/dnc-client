@@ -3,6 +3,7 @@ package helper
 import (
 	"encoding/json"
 	"io/ioutil"
+	"os"
 	"strings"
 )
 
@@ -61,4 +62,21 @@ func JSONify(str string) []byte {
 	js, err := json.Marshal(obj)
 	Check(err)
 	return js
+}
+
+func CheckAddr(addr string) bool {
+	if strings.Split(addr, ":")[0] == "127.0.0.1" {
+		return true
+	} else {
+		return false
+	}
+}
+
+func MakeConfig() {
+	if _, err := os.Stat("config"); err != nil {
+		file, err := os.Create("config")
+		Check(err)
+		_, err = file.Write([]byte("dir=./library&port=3000"))
+		Check(err)
+	}
 }
