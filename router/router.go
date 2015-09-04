@@ -25,7 +25,7 @@ func setCORS(res http.ResponseWriter) http.ResponseWriter {
 	res.Header().Set("Access-Control-Allow-Headers", "Accept, Content-Type, Content-Length, Accept-Encoding, X-CSRF-Token, Authorization")
 	return res
 }
-
+//get shared folder from config file
 func getDir() string {
 	helper.MakeConfig()
 	config, err := ioutil.ReadFile("config")
@@ -40,7 +40,7 @@ func getDir() string {
 func Port() string {
 	return port
 }
-
+//get port from config file
 func getPort() string {
 	helper.MakeConfig()
 	config, err := ioutil.ReadFile("config")
@@ -79,7 +79,7 @@ func Routes() *mux.Router {
 		}
 		portal.Signup(res, req)
 	}).Methods("GET")
-
+ //adds user to main server db + error handling
 	router.HandleFunc("/signup", func(res http.ResponseWriter, req *http.Request) {
 		if !helper.CheckAddr(req.RemoteAddr) {
 			return
@@ -110,7 +110,7 @@ func Routes() *mux.Router {
 		}
 		portal.Login(res, req)
 	}).Methods("GET")
-
+//login verification from main server db + error handling
 	router.HandleFunc("/login", func(res http.ResponseWriter, req *http.Request) {
 		if !helper.CheckAddr(req.RemoteAddr) {
 			return
@@ -118,7 +118,7 @@ func Routes() *mux.Router {
 		data, err := ioutil.ReadAll(req.Body)
 		helper.Check(err)
 		js := bytes.NewReader(helper.JSONify(string(data)))
-		sres, err := http.Post("http://dnctest.herokuapp.com/user/login", "application/json", js)
+		sres, err := http.Post("http://dnctest.herokuapp.com/user/login", "application/json", js) 
 		helper.Check(err)
 		sdata, err := ioutil.ReadAll(sres.Body)
 		helper.Check(err)
@@ -152,7 +152,7 @@ func Routes() *mux.Router {
 		log.Print("Sending library")
 		res.Write(js)
 	}).Methods("GET")
-
+//link is path name/file name and if non existent print blocking file on terminal
 	router.HandleFunc("/shared/{path:.*}", func(res http.ResponseWriter, req *http.Request) {
 		path := mux.Vars(req)["path"]
 		res = setCORS(res)
