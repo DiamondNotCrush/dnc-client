@@ -1,13 +1,16 @@
-package helper
+package share
 
 import (
 	"encoding/json"
 	"io/ioutil"
-	"os"
+	"log"
+	"net/http"
 	"strings"
+
+	"github.com/dnc/dnc-client/router/info"
+	"github.com/gorilla/mux"
 )
 
-//acceptable filetypes
 var fileTypes = map[string]bool{
 	"3gp":  true,
 	"avi":  true,
@@ -24,6 +27,7 @@ var fileTypes = map[string]bool{
 	"webm": true,
 	"wav":  true,
 }
+var sharedFiles = ListFiles(info.Dir())
 
 func Check(err error) {
 	if err != nil {
@@ -31,7 +35,6 @@ func Check(err error) {
 	}
 }
 
-//lists all sub folders within the shared directory
 func listRecursion(dir string, localDir string, fileObj map[string]bool) {
 	files, err := ioutil.ReadDir(dir + localDir)
 	Check(err)
@@ -47,37 +50,37 @@ func listRecursion(dir string, localDir string, fileObj map[string]bool) {
 	}
 }
 
-//lists qualified files
 func ListFiles(dir string) map[string]bool {
 	fileObj := make(map[string]bool)
 	localDir := ""
-	listRecursion(dir, localDir, fileObj)
+	listRecursion(info.Dir(), localDir, fileObj)
 	return fileObj
 }
-//form data into JSON object for login/signup
-func JSONify(str string) []byte {
-	obj := make(map[string]string)
-	strArr := strings.Split(str, "&")
-	for i := range strArr {
-		tuple := strings.Split(strArr[i], "=")
-		obj[tuple[0]] = tuple[1]
-	}
-	js, err := json.Marshal(obj)
+
+func Library(res http.ResponseWriter, req *http.Request) {
+	sharedFiles = ListFiles(info.Dir())
+	js, err := json.Marshal(sharedFiles)
 	Check(err)
-	return js
-}
-
-func CheckAddr(addr string) bool {
-	if strings.Split(addr, ":")[0] == "127.0.0.1" {
-		return true
-	} else {
-		return false
+	res.Header().Set("Content-Type", "application/json")
+	res = info.SetCORS(res)
+	if req.Method == "OPTIONS" {
+		return
 	}
+	log.Print("Sending library")
+	res.Write(js)
 }
 
-func MakeConfig() {
-	if _, err := os.Stat("config"); err != nil {
-		err := ioutil.WriteFile("config", []byte("dir=./&port=3000"), 0777)
-		Check(err)
+func Shared(res http.ResponseWriter, req *http.Request) {
+	path := mux.Vars(req)["path"]
+	res = info.SetCORS(res)
+	if req.Method == "OPTIONS" {
+		return
+	}
+	if sharedFiles[path] {
+		log.Print("Serving file: " + path)
+		http.ServeFile(res, req, info.Dir()+path)
+	} else {
+		log.Print("Blocking file: " + path)
+		res.WriteHeader(404)
 	}
 }
