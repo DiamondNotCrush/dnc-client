@@ -25,8 +25,6 @@ func MainPage(res http.ResponseWriter, req *http.Request, dir string, port strin
 	if userid > -1 {
 		status = `<span style="color:green">Logged in!</span>`
 	}
-	dir = `<span style="color:blue">` + dir + `</span>`
-	port = `<span style="color:blue">` + port + `</span>`
 	page := Page{dir, port, status, verify}
 	tmain.Execute(res, page)
 }

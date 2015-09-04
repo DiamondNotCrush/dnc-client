@@ -14,6 +14,7 @@ import (
 )
 
 var dir = getDir()
+var port = getPort()
 var sharedFiles = helper.ListFiles(dir)
 var verify = false
 var userid = -1
@@ -26,10 +27,9 @@ func setCORS(res http.ResponseWriter) http.ResponseWriter {
 }
 
 func getDir() string {
-	config, err := ioutil.ReadFile("./config")
+	config, err := ioutil.ReadFile("config")
 	helper.Check(err)
-	configArr := strings.Split(string(config), "\"")
-	dir := configArr[3]
+	dir := strings.Split(strings.Split(string(config), "&")[0], "=")[1]
 	if string(dir[len(dir)-1]) != "/" {
 		dir += "/"
 	}
@@ -37,10 +37,14 @@ func getDir() string {
 }
 
 func Port() string {
-	config, err := ioutil.ReadFile("./config")
+	return port
+}
+
+func getPort() string {
+	config, err := ioutil.ReadFile("config")
 	helper.Check(err)
-	configArr := strings.Split(string(config), "\"")
-	return configArr[1]
+	port := strings.Split(strings.Split(string(config), "&")[1], "=")[1]
+	return port
 }
 
 func Routes() *mux.Router {
@@ -53,15 +57,19 @@ func Routes() *mux.Router {
 		portal.MainPage(res, req, dir, Port(), verify, userid)
 	}).Methods("GET")
 
-	// router.HandleFunc("/", func(res http.ResponseWriter, req *http.Request) {
-	// 	if !helper.CheckAddr(req.RemoteAddr) {
-	// 		return
-	// 	}
-	// 	data, err := ioutil.ReadAll(req.Body)
-	// 	helper.Check(err)
-
-	// 	portal.MainPage(res, req, dir, Port(), verify, userid)
-	// }).Methods("POST")
+	router.HandleFunc("/", func(res http.ResponseWriter, req *http.Request) {
+		if !helper.CheckAddr(req.RemoteAddr) {
+			return
+		}
+		data, err := ioutil.ReadAll(req.Body)
+		helper.Check(err)
+		data = []byte(strings.Replace(string(data), "%2F", "/", -1))
+		err = ioutil.WriteFile("config", data, 0777)
+		helper.Check(err)
+		dir = getDir()
+		port = getPort()
+		portal.MainPage(res, req, dir, port, verify, userid)
+	}).Methods("POST")
 
 	router.HandleFunc("/signup", func(res http.ResponseWriter, req *http.Request) {
 		if !helper.CheckAddr(req.RemoteAddr) {

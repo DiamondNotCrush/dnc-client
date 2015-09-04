@@ -2,11 +2,9 @@
 <html>
   <body>
     <h1>Admin Portal</h1>
-    <p>Directory: {{.Dir}}</p>
-    <p>Port: {{.Port}}</p>
     <form action="" method="post">
-      <input type="text" name="dir"> New Directory <br>
-      <input type="text" name="port"> New Port <br><input type="submit" value="Set">
+      <input type="text" name="dir" value="{{.Dir}}"> Directory <br>
+      <input type="text" name="port" value="{{.Port}}"> Port <br><input type="submit" value="Set">
     </form>
     <br>
     <input type="button" onclick="location.href='/login';" value="Login" />

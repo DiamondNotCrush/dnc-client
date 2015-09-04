@@ -3,6 +3,7 @@ package helper
 import (
 	"encoding/json"
 	"io/ioutil"
+	"os"
 	"strings"
 )
 
@@ -68,5 +69,14 @@ func CheckAddr(addr string) bool {
 		return true
 	} else {
 		return false
+	}
+}
+
+func MakeConfig() {
+	if _, err := os.Stat("config"); err != nil {
+		file, err := os.Create("config")
+		Check(err)
+		_, err = file.Write([]byte("dir=./library&port=3000"))
+		Check(err)
 	}
 }
