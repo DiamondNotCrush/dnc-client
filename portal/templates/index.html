@@ -1,0 +1,15 @@
+<!DOCTYPE html>
+<html>
+  <body>
+    <h1>Admin Portal</h1>
+    <form action="" method="post">
+      <input type="text" name="dir" value="{{.Dir}}"> Directory <br>
+      <input type="text" name="port" value="{{.Port}}"> Port <br><input type="submit" value="Set">
+    </form>
+    <br>
+    <input type="button" onclick="location.href='/login';" value="Login" />
+    <input type="button" onclick="location.href='/signup';" value="Signup" />
+    <p>Login Status: {{.LoginStatus}}</p>
+    <p>Connection Status: {{.Verify}}</p>
+  </body>
+</html>

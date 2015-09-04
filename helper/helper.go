@@ -1,7 +1,9 @@
 package helper
 
 import (
+	"encoding/json"
 	"io/ioutil"
+	"os"
 	"strings"
 )
 
@@ -48,4 +50,31 @@ func ListFiles(dir string) map[string]bool {
 	localDir := ""
 	listRecursion(dir, localDir, fileObj)
 	return fileObj
+}
+
+func JSONify(str string) []byte {
+	obj := make(map[string]string)
+	strArr := strings.Split(str, "&")
+	for i := range strArr {
+		tuple := strings.Split(strArr[i], "=")
+		obj[tuple[0]] = tuple[1]
+	}
+	js, err := json.Marshal(obj)
+	Check(err)
+	return js
+}
+
+func CheckAddr(addr string) bool {
+	if strings.Split(addr, ":")[0] == "127.0.0.1" {
+		return true
+	} else {
+		return false
+	}
+}
+
+func MakeConfig() {
+	if _, err := os.Stat("config"); err != nil {
+		err := ioutil.WriteFile("config", []byte("dir=./&port=3000"), 0777)
+		Check(err)
+	}
 }
