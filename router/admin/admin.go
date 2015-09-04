@@ -21,6 +21,7 @@ func check(err error) {
 	}
 }
 
+//form data into JSON object for login/signup
 func jSONify(str string) []byte {
 	obj := make(map[string]string)
 	strArr := strings.Split(str, "&")

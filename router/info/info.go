@@ -16,6 +16,7 @@ func check(err error) {
 var dir = getDir()
 var port = getPort()
 
+//get shared folder from config file
 func getDir() string {
 	makeConfig()
 	config, err := ioutil.ReadFile("config")
@@ -27,6 +28,7 @@ func getDir() string {
 	return dir
 }
 
+//get port from config file
 func getPort() string {
 	makeConfig()
 	config, err := ioutil.ReadFile("config")
