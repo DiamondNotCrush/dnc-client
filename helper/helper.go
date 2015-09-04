@@ -74,9 +74,7 @@ func CheckAddr(addr string) bool {
 
 func MakeConfig() {
 	if _, err := os.Stat("config"); err != nil {
-		file, err := os.Create("config")
-		Check(err)
-		_, err = file.Write([]byte("dir=./library&port=3000"))
+		err := ioutil.WriteFile("config", []byte("dir=./&port=3000"), 0777)
 		Check(err)
 	}
 }
