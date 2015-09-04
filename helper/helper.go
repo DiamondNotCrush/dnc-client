@@ -62,3 +62,11 @@ func JSONify(str string) []byte {
 	Check(err)
 	return js
 }
+
+func CheckAddr(addr string) bool {
+	if strings.Split(addr, ":")[0] == "127.0.0.1" {
+		return true
+	} else {
+		return false
+	}
+}

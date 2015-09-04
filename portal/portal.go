@@ -17,14 +17,16 @@ var tsignup, _ = template.ParseFiles("../src/github.com/dnc/dnc-client/portal/te
 var tlogin, _ = template.ParseFiles("../src/github.com/dnc/dnc-client/portal/templates/login.html")
 
 func MainPage(res http.ResponseWriter, req *http.Request, dir string, port string, result bool, userid int) {
-	verify := `<p style="color:red">Unverified</p>`
+	verify := `<span style="color:red">Unverified</span>`
 	if result {
-		verify = `<p style="color:green">Verification complete!</p>`
+		verify = `<span style="color:green">Verification complete!</span>`
 	}
-	status := `<p style="color:red">Not logged in</p>`
+	status := `<span style="color:red">Not logged in</span>`
 	if userid > -1 {
-		status = `<p style="color:green">Logged in!</p>`
+		status = `<span style="color:green">Logged in!</span>`
 	}
+	dir = `<span style="color:blue">` + dir + `</span>`
+	port = `<span style="color:blue">` + port + `</span>`
 	page := Page{dir, port, status, verify}
 	tmain.Execute(res, page)
 }

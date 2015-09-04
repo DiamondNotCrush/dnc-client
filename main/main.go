@@ -10,6 +10,6 @@ import (
 
 func main() {
 	log.Println("Listening on port " + router.Port())
-	open.Start("http://localhost:" + router.Port())
+	open.Start("http://127.0.0.1:" + router.Port())
 	http.ListenAndServe(":"+router.Port(), router.Routes())
 }

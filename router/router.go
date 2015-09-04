@@ -47,18 +47,37 @@ func Routes() *mux.Router {
 	router := mux.NewRouter()
 
 	router.HandleFunc("/", func(res http.ResponseWriter, req *http.Request) {
+		if !helper.CheckAddr(req.RemoteAddr) {
+			return
+		}
 		portal.MainPage(res, req, dir, Port(), verify, userid)
 	}).Methods("GET")
 
+	// router.HandleFunc("/", func(res http.ResponseWriter, req *http.Request) {
+	// 	if !helper.CheckAddr(req.RemoteAddr) {
+	// 		return
+	// 	}
+	// 	data, err := ioutil.ReadAll(req.Body)
+	// 	helper.Check(err)
+
+	// 	portal.MainPage(res, req, dir, Port(), verify, userid)
+	// }).Methods("POST")
+
 	router.HandleFunc("/signup", func(res http.ResponseWriter, req *http.Request) {
+		if !helper.CheckAddr(req.RemoteAddr) {
+			return
+		}
 		portal.Signup(res, req)
 	}).Methods("GET")
 
 	router.HandleFunc("/signup", func(res http.ResponseWriter, req *http.Request) {
+		if !helper.CheckAddr(req.RemoteAddr) {
+			return
+		}
 		data, err := ioutil.ReadAll(req.Body)
 		helper.Check(err)
 		js := bytes.NewReader(helper.JSONify(string(data)))
-		sres, err := http.Post("https://diamondnotcrush.herokuapp.com/user/addUser", "application/json", js)
+		sres, err := http.Post("http://dnctest.herokuapp.com/user/addUser", "application/json", js)
 		helper.Check(err)
 		sdata, err := ioutil.ReadAll(sres.Body)
 		helper.Check(err)
@@ -76,14 +95,20 @@ func Routes() *mux.Router {
 	}).Methods("POST")
 
 	router.HandleFunc("/login", func(res http.ResponseWriter, req *http.Request) {
+		if !helper.CheckAddr(req.RemoteAddr) {
+			return
+		}
 		portal.Login(res, req)
 	}).Methods("GET")
 
 	router.HandleFunc("/login", func(res http.ResponseWriter, req *http.Request) {
+		if !helper.CheckAddr(req.RemoteAddr) {
+			return
+		}
 		data, err := ioutil.ReadAll(req.Body)
 		helper.Check(err)
 		js := bytes.NewReader(helper.JSONify(string(data)))
-		sres, err := http.Post("https://diamondnotcrush.herokuapp.com/user/login", "application/json", js)
+		sres, err := http.Post("http://dnctest.herokuapp.com/user/login", "application/json", js)
 		helper.Check(err)
 		sdata, err := ioutil.ReadAll(sres.Body)
 		helper.Check(err)
@@ -99,15 +124,6 @@ func Routes() *mux.Router {
 		}
 		http.Redirect(res, req, "/", 302)
 	}).Methods("POST")
-
-	router.HandleFunc("/connection", func(res http.ResponseWriter, req *http.Request) {
-		if userid > -1 {
-			js := bytes.NewReader(helper.JSONify("userid=" + string(userid) + "&port=" + Port()))
-			_, err := http.Post("https://diamondnotcrush.herokuapp.com/connection/addConnection", "application/json", js)
-			helper.Check(err)
-		}
-		http.Redirect(res, req, "/", 302)
-	}).Methods("GET")
 
 	router.HandleFunc("/verify", func(res http.ResponseWriter, req *http.Request) {
 		verify = true
