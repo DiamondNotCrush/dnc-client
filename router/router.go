@@ -11,6 +11,7 @@ import (
 	"github.com/dnc/dnc-client/helper"
 	"github.com/dnc/dnc-client/portal"
 	"github.com/gorilla/mux"
+	//"gihub.com/codeskyblue/go-sh"
 )
 
 var dir = getDir()
@@ -161,7 +162,26 @@ func Routes() *mux.Router {
 		}
 		if sharedFiles[path] {
 			log.Print("Serving file: " + path)
+			
+			//Start ffmpeg output to new temporary
+			  /*
+			      FFMpeg options
+			        -i: input filename
+			        -o: output filename
+			        -movflags faststart: moves metadata from end of file to the beginning to decode and view at destination
+			  */
+			// -- Not sure if .Output() is needed - not yet tested
+			// out, err := sh.Command("ffmpeg", "-movflags", "faststart", "-i", dir+path, "-o", "./temp_output.mp4").Output()
+			
+			//Check for errors in transcoding
+			 // if err != nil {
+			 //        log.Print("Error transcoding: %v", err)
+			 //      }
+			
+			//Serve temporary file
+			// http.ServeFile(res, req, out)
 			http.ServeFile(res, req, dir+path)
+			//Remove temporary file when finished
 		} else {
 			log.Print("Blocking file: " + path)
 			res.WriteHeader(404)
