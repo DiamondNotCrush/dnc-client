@@ -27,6 +27,7 @@ func setCORS(res http.ResponseWriter) http.ResponseWriter {
 }
 
 func getDir() string {
+	helper.MakeConfig()
 	config, err := ioutil.ReadFile("config")
 	helper.Check(err)
 	dir := strings.Split(strings.Split(string(config), "&")[0], "=")[1]
@@ -41,6 +42,7 @@ func Port() string {
 }
 
 func getPort() string {
+	helper.MakeConfig()
 	config, err := ioutil.ReadFile("config")
 	helper.Check(err)
 	port := strings.Split(strings.Split(string(config), "&")[1], "=")[1]
