@@ -6,6 +6,7 @@ import (
 	"io/ioutil"
 	"log"
 	"net/http"
+	"strconv"
 	"strings"
 
 	"github.com/dnc/dnc-client/portal"
@@ -57,19 +58,12 @@ func PostSignup(res http.ResponseWriter, req *http.Request) {
 	js := bytes.NewReader(jSONify(string(data)))
 	sres, err := http.Post("http://dnctest.herokuapp.com/user/addUser", "application/json", js)
 	check(err)
-	sdata, err := ioutil.ReadAll(sres.Body)
-	check(err)
-	var obj map[string]*json.RawMessage
-	err = json.Unmarshal(sdata, &obj)
-	check(err)
-	err = json.Unmarshal(*obj["id"], &userid)
-	check(err)
 	if err != nil {
 		log.Println("Signup failed")
 	} else {
 		log.Println("Signup success")
 	}
-	http.Redirect(res, req, "/", 302)
+	Ping(res, req, sres)
 }
 
 func GetLogin(res http.ResponseWriter, req *http.Request) {
@@ -88,6 +82,15 @@ func PostLogin(res http.ResponseWriter, req *http.Request) {
 	js := bytes.NewReader(jSONify(string(data)))
 	sres, err := http.Post("http://dnctest.herokuapp.com/user/login", "application/json", js)
 	check(err)
+	if err != nil {
+		log.Println("Login failed")
+	} else {
+		log.Println("Login success")
+	}
+	Ping(res, req, sres)
+}
+
+func Ping(res http.ResponseWriter, req *http.Request, sres *http.Response) {
 	sdata, err := ioutil.ReadAll(sres.Body)
 	check(err)
 	var obj map[string]*json.RawMessage
@@ -95,11 +98,16 @@ func PostLogin(res http.ResponseWriter, req *http.Request) {
 	check(err)
 	err = json.Unmarshal(*obj["id"], &userid)
 	check(err)
-	if err != nil {
-		log.Println("Login failed")
-	} else {
-		log.Println("Login success")
+	port, err := strconv.Atoi(info.Port())
+	check(err)
+	ping := map[string]int{
+		"userid": userid,
+		"port":   port,
 	}
+	jsstr, err := json.Marshal(ping)
+	check(err)
+	_, err = http.Post("http://dnctest.herokuapp.com/connection/addConnection", "application/json", bytes.NewReader(jsstr))
+	check(err)
 	http.Redirect(res, req, "/", 302)
 }
 
