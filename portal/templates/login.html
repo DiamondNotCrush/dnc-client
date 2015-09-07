@@ -1,12 +1,13 @@
-<!DOCTYPE html>
-<html>
-  <body>
-    <h1>Login</h1>
-    <form action="" method="post">
-      <input type="text" name="username"> Username<br>
-      <input type="password" name="password"> Password<br>
-      <input type="button" onclick="location.href='/';" value="Back" />
-      <input type="submit" value="Submit">
+{{define "login"}}
+{{template "header" .}}
+    <h4>Login</h4>
+    <p>
+    <form action="" method="post" class="well well-sm">
+      <input type="text" name="username" class="form-control" placeholder="Username"><br>
+      <input type="password" name="password" class="form-control" placeholder="Password"><br><br>
+      <input type="button" onclick="location.href='/';" value="Back" class="btn btn-default"/>
+      <input type="submit" value="Submit" class="btn btn-default">
     </form>
-  </body>
-</html>
+    </p>
+{{template "footer" .}}
+{{end}}
