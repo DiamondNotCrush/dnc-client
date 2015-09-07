@@ -1,2 +1,1 @@
-PORT="4000"
-SHARE_FOLDER="./test"
+dir=./test/&port=4000
