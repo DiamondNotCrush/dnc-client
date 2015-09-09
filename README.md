@@ -46,3 +46,6 @@ src/
         router.go
         router_test.go
 ```
+###Building
+
+The application is built by running ```go install``` inside the main/ directory. The executable is created in the bin/ folder that should be located in the same directory as the src/ root of the application.
