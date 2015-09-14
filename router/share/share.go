@@ -12,58 +12,77 @@ import (
 )
 
 //acceptable filetypes
-var fileTypes = map[string]bool{
-	"3gp":  true,
-	"avi":  true,
-	"mov":  true,
-	"mp4":  true,
-	"m4v":  true,
-	"m4a":  true,
-	"mp3":  true,
-	"mkv":  true,
-	"ogv":  true,
-	"ogm":  true,
-	"ogg":  true,
-	"oga":  true,
-	"webm": true,
-	"wav":  true,
+var fileTypes = map[string]string{
+	"3gp":  "v",
+	"avi":  "v",
+	"mov":  "v",
+	"mp4":  "v",
+	"m4v":  "v",
+	"m4a":  "a",
+	"mp3":  "a",
+	"mkv":  "v",
+	"ogv":  "v",
+	"ogm":  "v",
+	"ogg":  "v",
+	"oga":  "a",
+	"webm": "v",
+	"wav":  "a",
 }
 var sharedFiles = ListFiles(info.Dir())
 
-func Check(err error) {
+func check(err error) {
 	if err != nil {
 		panic(err)
 	}
 }
 
+func getImdb(name string) string {
+	res, err := http.Get("http://www.omdbapi.com/?t=" + name)
+	check(err)
+	body, err := ioutil.ReadAll(res.Body)
+	filmData := make(map[string]string)
+	err = json.Unmarshal(body, &filmData)
+	check(err)
+	poster, ok := filmData["Poster"]
+	if ok {
+		return poster
+	} else {
+		return ""
+	}
+}
+
 //lists all sub folders within the shared directory
-func listRecursion(dir string, localDir string, fileObj map[string]bool) {
+func listRecursion(dir string, localDir string, fileObj map[string]string) {
 	files, err := ioutil.ReadDir(dir + localDir)
-	Check(err)
+	check(err)
 	for _, file := range files {
 		if file.IsDir() {
 			listRecursion(dir, localDir+file.Name()+"/", fileObj)
 		} else {
-			strArr := strings.Split(file.Name(), ".")
-			if fileTypes[strArr[len(strArr)-1]] {
-				fileObj[localDir+file.Name()] = true
+			fileNameArr := strings.Split(file.Name(), ".")
+			format := fileTypes[fileNameArr[len(fileNameArr)-1]]
+			name := strings.Join(fileNameArr[:(len(fileNameArr)-1)], ".")
+			if format == "v" {
+				fileObj[localDir+file.Name()] = getImdb(name)
+			} else if format == "a" {
+				fileObj[localDir+file.Name()] = ""
 			}
 		}
 	}
 }
 
 //lists qualified files
-func ListFiles(dir string) map[string]bool {
-	fileObj := make(map[string]bool)
+func ListFiles(dir string) map[string]string {
+	fileObj := make(map[string]string)
 	localDir := ""
 	listRecursion(info.Dir(), localDir, fileObj)
 	return fileObj
 }
 
 func Library(res http.ResponseWriter, req *http.Request) {
-	sharedFiles = ListFiles(info.Dir())
+	// sharedFiles = ListFiles(info.Dir())
 	js, err := json.Marshal(sharedFiles)
-	Check(err)
+	check(err)
 	res.Header().Set("Content-Type", "application/json")
 	res = info.SetCORS(res)
 	if req.Method == "OPTIONS" {
@@ -79,7 +98,7 @@ func Shared(res http.ResponseWriter, req *http.Request) {
 	if req.Method == "OPTIONS" {
 		return
 	}
-	if sharedFiles[path] {
+	if _, ok := sharedFiles[path]; ok {
 		log.Print("Serving file: " + path)
 		http.ServeFile(res, req, info.Dir()+path)
 	} else {
