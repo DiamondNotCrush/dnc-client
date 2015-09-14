@@ -15,6 +15,7 @@ type Page struct {
 var tmain, _ = template.ParseFiles("../src/github.com/dnc/dnc-client/portal/templates/index.html")
 var tsignup, _ = template.ParseFiles("../src/github.com/dnc/dnc-client/portal/templates/signup.html")
 var tlogin, _ = template.ParseFiles("../src/github.com/dnc/dnc-client/portal/templates/login.html")
+var tstream, _ = template.ParseFiles("../src/github.com/dnc/dnc-client/portal/templates/stream.html")
 
 //check user status
 func MainPage(res http.ResponseWriter, req *http.Request, dir string, port string, result bool, userid int) {
@@ -38,4 +39,8 @@ func Signup(res http.ResponseWriter, req *http.Request) {
 //redirect to login html
 func Login(res http.ResponseWriter, req *http.Request) {
 	tlogin.Execute(res, nil)
+}
+
+func Stream(res http.ResponseWriter, req *http.Request) {
+	tstream.Execute(res, nil)
 }

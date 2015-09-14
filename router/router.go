@@ -1,6 +1,7 @@
 package router
 
 import (
+	"github.com/dnc/dnc-client/portal"
 	"github.com/dnc/dnc-client/router/admin"
 	"github.com/dnc/dnc-client/router/info"
 	"github.com/dnc/dnc-client/router/share"
@@ -28,6 +29,8 @@ func Routes() *mux.Router {
 	router.HandleFunc("/library", share.Library).Methods("GET")
 	//link is path name/file name and if non existent print blocking file on terminal
 	router.HandleFunc("/shared/{path:.*}", share.Shared).Methods("GET")
+
+	router.HandleFunc("/stream", portal.Stream).Methods("GET")
 
 	return router
 }
