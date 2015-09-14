@@ -3,17 +3,14 @@ package share
 import (
 	"encoding/json"
 	"io/ioutil"
-	"bufio"
-	"os"
 	"log"
-	"time"
 	"net/http"
 	"strings"
+	"time"
 
+	"github.com/codeskyblue/go-sh"
 	"github.com/dnc/dnc-client/router/info"
 	"github.com/gorilla/mux"
-
-	"github.com/codeskyblue/go-sh"	
 )
 
 //acceptable filetypes
@@ -35,7 +32,9 @@ var fileTypes = map[string]bool{
 }
 var sharedFiles = ListFiles(info.Dir())
 
-func Check(err error) {
+var streaming = false
+
+func check(err error) {
 	if err != nil {
 		panic(err)
 	}
@@ -44,7 +43,7 @@ func Check(err error) {
 //lists all sub folders within the shared directory
 func listRecursion(dir string, localDir string, fileObj map[string]bool) {
 	files, err := ioutil.ReadDir(dir + localDir)
-	Check(err)
+	check(err)
 	for _, file := range files {
 		if file.IsDir() {
 			listRecursion(dir, localDir+file.Name()+"/", fileObj)
@@ -68,7 +67,7 @@ func ListFiles(dir string) map[string]bool {
 func Library(res http.ResponseWriter, req *http.Request) {
 	sharedFiles = ListFiles(info.Dir())
 	js, err := json.Marshal(sharedFiles)
-	Check(err)
+	check(err)
 	res.Header().Set("Content-Type", "application/json")
 	res = info.SetCORS(res)
 	if req.Method == "OPTIONS" {
@@ -81,66 +80,32 @@ func Library(res http.ResponseWriter, req *http.Request) {
 func Shared(res http.ResponseWriter, req *http.Request) {
 	path := mux.Vars(req)["path"]
 	res = info.SetCORS(res)
+
 	if req.Method == "OPTIONS" {
 		return
 	}
 	if sharedFiles[path] {
+		if streaming {
+			_ = sh.Command("taskkill", "/im", "vlc.exe").Run()
+		}
 
 		log.Print("Serving file: " + path)
-		  /*
-		      FFMpeg options
-		        -i: input filename
-		        -strict -2: force use of exprimental aac decoder
-		        -movflags faststart: moves metadata from end of file to the beginning to decode and view at destination
-		  */
+
 		go func() {
 			//Start ffmpeg output to new temporary
-			err := sh.Command("ffmpeg", "-i", info.Dir()+path, "-strict", "-2", "-movflags", "faststart", "-preset", "ultrafast", info.Dir()+"temp_output.mp4").Run()		 
-			//Check for errors in transcoding
+			streaming = true
+			err := sh.Command("vlc", "-vvv", info.Dir()+path, "--sout", "#transcode{vcodec=VP80,vb=2000,acodec=vorb,ab=128,channels=2,samplerate=44100}:http{mux=webm,dst=:5000}").Run()
+
 			if err != nil {
-			 				log.Printf("Error transcoding: %s", err)
+				log.Printf("Error transcoding: %s", err)
 			}
 		}()
 
 		//Sleep so file is ready
-		time.Sleep(1000 * 1000 * 1000 * 5)
+		time.Sleep(1000 * 1000 * 1000 * 2)
 
-		hj, ok := res.(http.Hijacker)
-		if !ok {
-			http.Error(res, "Server does not support hijacking", http.StatusInternalServerError)
-			return
-		}
-
-		conn, bufrw, err := hj.Hijack()
-		if err != nil {
-			http.Error(res, err.Error(), http.StatusInternalServerError)
-			return
-		}
-
-		//Read from file
-		file, err := os.Open(info.Dir()+"temp_output.mp4")
-		if err != nil {
-			log.Printf("Error reading file: %s", err)
-		}
-
-		b := bufio.NewReader(file)
-
-		defer conn.Close()
-		
-		//stream to browser
-		res.Header().Set("Content-Type", "video/mp4")
-
-		if _, err := b.WriteTo(res); err != nil {
-			log.Printf("Error writing to http response: %s", err)
-		}
-		
-		bufrw.Flush()
-
-		res.Write([]byte("File Sent"))
-
-		//Remove file after it's been served
-		os.Remove(info.Dir()+"temp_output.mp4")
-
+		http.Redirect(res, req, "/stream", 301)
+		return
 	} else {
 		log.Print("Blocking file: " + path)
 		res.WriteHeader(404)
