@@ -1,26 +1,51 @@
-# dnc-client
+# Project Name
+DnC Media - Client Server
 
-The DNC client allows you to stream your music and videos from your computer so they can be accessible everywhere. The computer is used as a server and the website acts as an intermediary for the content.
+#Project Overview
 
-Currently, just run go install in the folder directory where main.go is located. There should be a config file generated along with an exe file. Run the exe and there should be a pop up of localhost and default port 3000.
+DnC Media is an open-source media server solution. This client server is part of the [DnC Media suite.](https://github.com/DiamondNotCrush/dnc-web) and contains the client server application necesary to serve the user's media files. The client server is written in Go.
 
-The shared folder directory along with the port can be changed inside the config file.
+#Usage
 
-#The Folder Structure
+The client server is installed on the users's computer which hosts their media files. Once the server is started, a broswer window opens which allows the user to do some initial but simple setup. This admin portal allows the user to signup, login, and set the folder that contains their media.
 
-The dnc-client is broken into four parts: helper, portal, main, and router. 
+##Development
 
-Helper.go contains the functions necessary for the admin portal to run. It has code that searches and lists all the shared files, filters the extensions, user functions and etc.
+###Installing Dependencies
 
-Portal.go is the templating for the admin portal with the redirect functions needed for sign-up, verification, and log-in.
+Since the client is written in go, the command '''go get''' folowed by the following packages will install the necessary dependencies for development.
+  1. github.com/gorilla/mux
+  1. github.com/skratchdot/open-golang/open
+  1. github.com/codeskyblue/go-sh
 
-Router.go routes data to the main web server that handles the user sign up other relevant details. It also gets the folder from the config file and serves it onto the web.
+###Structure
 
-There is also a test config file and a router_test file to test various aspects of the server.
+This application follows the below structure:
+```
+src/
+  github.com/
+    *dependencies*/
+    dnc-client/
+      main/
+        main.go
+      portal/
+        templates/
+          index.html
+          login.html
+          signup.html
+        portal.go
+      router/
+        admin/
+          admin.go
+        info/
+          info.go
+        share/
+          share.go
+        test/
+        config
+        router.go
+        router_test.go
+```
+###Building
 
-Main.go is the file that should be go installed and then run.
-
-
-
-
-
+The application is built by running ```go install``` inside the main/ directory. The executable is created in the bin/ folder that should be located in the same directory as the src/ root of the application.
