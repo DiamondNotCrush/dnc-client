@@ -38,7 +38,9 @@ func check(err error) {
 
 func getImdb(name string) string {
 	res, err := http.Get("http://www.omdbapi.com/?t=" + name)
-	check(err)
+	if err != nil {
+		return ""
+	}
 	body, err := ioutil.ReadAll(res.Body)
 	filmData := make(map[string]string)
 	err = json.Unmarshal(body, &filmData)
@@ -54,7 +56,9 @@ func getImdb(name string) string {
 func getItunes(name string) string {
 	name = strings.Join(strings.Split(name, " "), "+")
 	res, err := http.Get("https://itunes.apple.com/search?limit=1&term=" + name)
-	check(err)
+	if err != nil {
+		return ""
+	}
 	body, err := ioutil.ReadAll(res.Body)
 	resultObj := make(map[string]interface{})
 	err = json.Unmarshal(body, &resultObj)
@@ -83,9 +87,15 @@ func listRecursion(dir string, localDir string, fileObj map[string]string) {
 			format := fileTypes[fileNameArr[len(fileNameArr)-1]]
 			name := strings.Join(fileNameArr[:(len(fileNameArr)-1)], ".")
 			if format == "v" {
-				fileObj[localDir+file.Name()] = getImdb(name)
+				fileObj[localDir+file.Name()] = ""
+				go func(fullPath string, name string) {
+					fileObj[fullPath] = getImdb(name)
+				}(localDir+file.Name(), name)
 			} else if format == "a" {
-				fileObj[localDir+file.Name()] = getItunes(name)
+				fileObj[localDir+file.Name()] = ""
+				go func(fullPath string, name string) {
+					fileObj[fullPath] = getItunes(name)
+				}(localDir+file.Name(), name)
 			}
 		}
 	}
