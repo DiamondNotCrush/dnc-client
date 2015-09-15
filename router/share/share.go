@@ -86,15 +86,14 @@ func listRecursion(dir string, localDir string, fileObj map[string]string) {
 			fileNameArr := strings.Split(file.Name(), ".")
 			format := fileTypes[fileNameArr[len(fileNameArr)-1]]
 			name := strings.Join(fileNameArr[:(len(fileNameArr)-1)], ".")
-			if format == "v" {
+			if format != "" {
 				fileObj[localDir+file.Name()] = ""
 				go func(fullPath string, name string) {
-					fileObj[fullPath] = getImdb(name)
-				}(localDir+file.Name(), name)
-			} else if format == "a" {
-				fileObj[localDir+file.Name()] = ""
-				go func(fullPath string, name string) {
-					fileObj[fullPath] = getItunes(name)
+					if format == "v" {
+						fileObj[fullPath] = getImdb(name)
+					} else {
+						fileObj[fullPath] = getItunes(name)
+					}
 				}(localDir+file.Name(), name)
 			}
 		}
