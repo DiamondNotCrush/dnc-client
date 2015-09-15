@@ -63,7 +63,9 @@ func getItunes(name string) string {
 	if numResults == 1 {
 		results := resultObj["results"].([]interface{})
 		data := results[0].(map[string]interface{})
-		return data["artworkUrl100"].(string)
+		art := data["artworkUrl100"].(string)
+		art = strings.Replace(art, "100x100", "400x400", 2)
+		return art
 	} else {
 		return ""
 	}
