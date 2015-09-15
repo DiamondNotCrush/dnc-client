@@ -51,6 +51,24 @@ func getImdb(name string) string {
 	}
 }
 
+func getItunes(name string) string {
+	name = strings.Join(strings.Split(name, " "), "+")
+	res, err := http.Get("https://itunes.apple.com/search?limit=1&term=" + name)
+	check(err)
+	body, err := ioutil.ReadAll(res.Body)
+	resultObj := make(map[string]interface{})
+	err = json.Unmarshal(body, &resultObj)
+	check(err)
+	numResults := resultObj["resultCount"].(float64)
+	if numResults == 1 {
+		results := resultObj["results"].([]interface{})
+		data := results[0].(map[string]interface{})
+		return data["artworkUrl100"].(string)
+	} else {
+		return ""
+	}
+}
+
 //lists all sub folders within the shared directory
 func listRecursion(dir string, localDir string, fileObj map[string]string) {
 	files, err := ioutil.ReadDir(dir + localDir)
@@ -65,7 +83,7 @@ func listRecursion(dir string, localDir string, fileObj map[string]string) {
 			if format == "v" {
 				fileObj[localDir+file.Name()] = getImdb(name)
 			} else if format == "a" {
-				fileObj[localDir+file.Name()] = ""
+				fileObj[localDir+file.Name()] = getItunes(name)
 			}
 		}
 	}
