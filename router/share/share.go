@@ -59,7 +59,7 @@ func getItunes(name string) string {
 }
 
 //lists all sub folders within the shared directory
-func listRecursion(dir string, localDir string, fileObj map[string]string) {
+func listRecursion(dir string, localDir string, fileObj map[string]interface{}) {
 	files, err := ioutil.ReadDir(dir + localDir)
 	check(err)
 	for _, file := range files {
@@ -70,9 +70,12 @@ func listRecursion(dir string, localDir string, fileObj map[string]string) {
 			format := fileTypes[fileNameArr[len(fileNameArr)-1]]
 			name := strings.Join(fileNameArr[:(len(fileNameArr)-1)], ".")
 			if format != "" {
-				fileObj[localDir+file.Name()] = ""
+				fileObj[localDir+file.Name()] = false
 				go func(fullPath string, name string) {
-					fileObj[fullPath] = getItunes(name)
+					image := getItunes(name)
+					if image != "" {
+						fileObj[fullPath] = image
+					}
 				}(localDir+file.Name(), name)
 			}
 		}
@@ -80,8 +83,8 @@ func listRecursion(dir string, localDir string, fileObj map[string]string) {
 }
 
 //lists qualified files
-func ListFiles(dir string) map[string]string {
-	fileObj := make(map[string]string)
+func ListFiles(dir string) map[string]interface{} {
+	fileObj := make(map[string]interface{})
 	localDir := ""
 	listRecursion(info.Dir(), localDir, fileObj)
 	return fileObj
