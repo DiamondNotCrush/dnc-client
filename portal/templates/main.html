@@ -13,9 +13,9 @@
     <p>
     <form action="" method="post" class="well well-sm">
       Directory: {{.Dir}}<br>
-      <input type="text" name="dir" class="form-control" placeholder="Directory">
+      <input type="text" name="dir" class="form-control" value="{{.Dir}}">
       Port: {{.Port}}<br>
-      <input type="text" name="port" class="form-control" placeholder="Port"><br>
+      <input type="text" name="port" class="form-control" value="{{.Port}}"><br>
       <input type="submit" value="Set" class="btn btn-default">
       </p><p>
       A port change requires a restart.
