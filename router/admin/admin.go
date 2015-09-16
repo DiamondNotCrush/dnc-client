@@ -56,7 +56,7 @@ func PostSignup(res http.ResponseWriter, req *http.Request) {
 	data, err := ioutil.ReadAll(req.Body)
 	check(err)
 	js := bytes.NewReader(jSONify(string(data)))
-	sres, err := http.Post("http://dnctest.herokuapp.com/user/addUser", "application/json", js)
+	sres, err := http.Post("http://diamondnotcrush.herokuapp.com/user/addUser", "application/json", js)
 	check(err)
 	if err != nil {
 		log.Println("Signup failed")
@@ -80,7 +80,7 @@ func PostLogin(res http.ResponseWriter, req *http.Request) {
 	data, err := ioutil.ReadAll(req.Body)
 	check(err)
 	js := bytes.NewReader(jSONify(string(data)))
-	sres, err := http.Post("http://dnctest.herokuapp.com/user/login", "application/json", js)
+	sres, err := http.Post("http://diamondnotcrush.herokuapp.com/user/login", "application/json", js)
 	check(err)
 	if err != nil {
 		log.Println("Login failed")
@@ -106,7 +106,7 @@ func Ping(res http.ResponseWriter, req *http.Request, sres *http.Response) {
 	}
 	jsstr, err := json.Marshal(ping)
 	check(err)
-	_, err = http.Post("http://dnctest.herokuapp.com/connection/addConnection", "application/json", bytes.NewReader(jsstr))
+	_, err = http.Post("http://diamondnotcrush.herokuapp.com/connection/addConnection", "application/json", bytes.NewReader(jsstr))
 	check(err)
 	http.Redirect(res, req, "/", 302)
 }

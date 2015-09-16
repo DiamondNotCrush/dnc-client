@@ -41,8 +41,8 @@ func TestLibrary(t *testing.T) {
 		t.Error(err)
 	}
 
-	if string(contents) != `{"blank.mp3":true,"folder/nested.mp3":true}` {
-		t.Errorf("Expected: " + string(contents) + " to be " + `{"blank.mp3":true}`)
+	if string(contents) != `{"blank.mp3":false,"folder/nested.mp3":false}` {
+		t.Errorf("Expected: " + string(contents) + " to be " + `{"blank.mp3":false,"folder/nested.mp3":false}`)
 	}
 }
 
