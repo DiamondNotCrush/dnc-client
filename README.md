@@ -25,26 +25,25 @@ This application follows the below structure:
 src/
   github.com/
     *dependencies*/
-    dnc-client/
-      main/
-        main.go
-      portal/
-        templates/
-          index.html
-          login.html
-          signup.html
-        portal.go
-      router/
-        admin/
-          admin.go
-        info/
-          info.go
-        share/
-          share.go
-        test/
-        config
-        router.go
-        router_test.go
+    DiamondNotCrush/
+      dnc-client/
+        main/
+          main.go
+        portal/
+          portalTemplates/
+            portalTemplates.go
+          portal.go
+        router/
+          admin/
+            admin.go
+          info/
+            info.go
+          share/
+            share.go
+          test/
+          config (for router_test)
+          router.go
+          router_test.go
 ```
 ###Building
 
