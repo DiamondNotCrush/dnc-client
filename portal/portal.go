@@ -2,27 +2,11 @@ package portal
 
 import (
 	"net/http"
-	"text/template"
+
+	"github.com/dnc/dnc-client/portal/portalTemplates"
 )
 
-type Page struct {
-	Title       string
-	Dir         string
-	Port        string
-	LoginStatus string
-	Verify      string
-}
-
-var templates = template.Must(template.ParseFiles(
-	"../src/github.com/dnc/dnc-client/portal/templates/header.html",
-	"../src/github.com/dnc/dnc-client/portal/templates/footer.html",
-	"../src/github.com/dnc/dnc-client/portal/templates/main.html",
-	"../src/github.com/dnc/dnc-client/portal/templates/signup.html",
-	"../src/github.com/dnc/dnc-client/portal/templates/login.html"))
-
-// var tmain, _ = template.ParseFiles("../src/github.com/dnc/dnc-client/portal/templates/main.html")
-// var tsignup, _ = template.ParseFiles("../src/github.com/dnc/dnc-client/portal/templates/signup.html")
-// var tlogin, _ = template.ParseFiles("../src/github.com/dnc/dnc-client/portal/templates/login.html")
+var templates = portalTemplates.Generate()
 
 //check user status
 func MainPage(res http.ResponseWriter, req *http.Request, dir string, port string, result bool, userid int) {
@@ -34,8 +18,14 @@ func MainPage(res http.ResponseWriter, req *http.Request, dir string, port strin
 	if userid > -1 {
 		status = `<span style="color:green">Logged in!</span>`
 	}
-	// page := Page{dir, port, status, verify}
-	templates.ExecuteTemplate(res, "main", &Page{"Home", dir, port, status, verify})
+	data := struct {
+		Title       string
+		Dir         string
+		Port        string
+		LoginStatus string
+		Verify      string
+	}{"Home", dir, port, status, verify}
+	templates.ExecuteTemplate(res, "main", data)
 }
 
 //redirect to signup html
