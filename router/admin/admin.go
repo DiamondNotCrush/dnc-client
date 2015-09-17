@@ -9,8 +9,8 @@ import (
 	"strconv"
 	"strings"
 
-	"github.com/dnc/dnc-client/portal"
-	"github.com/dnc/dnc-client/router/info"
+	"github.com/DiamondNotCrush/dnc-client/portal"
+	"github.com/DiamondNotCrush/dnc-client/router/info"
 )
 
 var verify = false
