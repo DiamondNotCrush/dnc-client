@@ -8,7 +8,7 @@ import (
 	"net/http/httptest"
 	"testing"
 
-	"github.com/dnc/dnc-client/router"
+	"github.com/DiamondNotCrush/dnc-client/router"
 )
 
 var (

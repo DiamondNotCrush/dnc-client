@@ -1,9 +1,9 @@
 package router
 
 import (
-	"github.com/dnc/dnc-client/router/admin"
-	"github.com/dnc/dnc-client/router/info"
-	"github.com/dnc/dnc-client/router/share"
+	"github.com/DiamondNotCrush/dnc-client/router/admin"
+	"github.com/DiamondNotCrush/dnc-client/router/info"
+	"github.com/DiamondNotCrush/dnc-client/router/share"
 	"github.com/gorilla/mux"
 )
 
