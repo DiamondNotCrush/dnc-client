@@ -13,7 +13,9 @@ The client server is installed on the users's computer which hosts their media f
 
 ###Installing Dependencies
 
-Since the client is written in go, the command '''go get''' folowed by the following packages will install the necessary dependencies for development.
+The client is written in Go which can be downloaded from [golang.org/doc/install](https://golang.org/doc/install)
+
+Since the client is written in Go, the command '''go get''' folowed by the following packages will install the necessary dependencies for development.
   1. github.com/gorilla/mux
   1. github.com/skratchdot/open-golang/open
   1. github.com/codeskyblue/go-sh
