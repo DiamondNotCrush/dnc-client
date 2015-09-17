@@ -4,8 +4,8 @@ import (
 	"log"
 	"net/http"
 
-	"github.com/dnc/dnc-client/router"
-	"github.com/dnc/dnc-client/router/info"
+	"github.com/DiamondNotCrush/dnc-client/router"
+	"github.com/DiamondNotCrush/dnc-client/router/info"
 	"github.com/skratchdot/open-golang/open"
 )
 

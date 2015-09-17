@@ -3,7 +3,7 @@ package portal
 import (
 	"net/http"
 
-	"github.com/dnc/dnc-client/portal/portalTemplates"
+	"github.com/DiamondNotCrush/dnc-client/portal/portalTemplates"
 )
 
 var templates = portalTemplates.Generate()
