@@ -2,6 +2,7 @@
 DnC Media - Client Server
 
 #Project Overview
+The deployed web-site is [here] (http://diamondnotcrush.herokuapp.com/)
 
 DnC Media is an open-source media server solution. This client server is part of the [DnC Media suite.](https://github.com/DiamondNotCrush/dnc-web) and contains the client server application necesary to serve the user's media files. The client server is written in Go.
 
